@@ -36,11 +36,13 @@ class TaskController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
+            'name'   => 'required',
+            'status' => 'required',
         ]);
         try {
             Task::create([
-                'name' => $request->name,
+                'name'   => $request->name,
+                'status' => $request->status,
             ]);
             return response()->json(['success' => 'Yah! a task has been successfully created.', 'status' => 200]);
         } catch (Exception $exception) {
@@ -84,15 +86,25 @@ class TaskController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param int                      $id
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param         $id
+     * @return Exception|\Illuminate\Http\JsonResponse
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'name' => 'required',
+        ]);
+        try {
+            $TaskUpdate         = Task::findOrfail($id);
+            $TaskUpdate->name   = $request->name;
+            $TaskUpdate->status = $request->status;
+            $TaskUpdate->update();
+            return response()->json(['success' => 'Task Successfully Updated.'], 200);
+
+        } catch (Exception $exception) {
+            return $exception;
+        }
     }
 
     /**
